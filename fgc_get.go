@@ -25,9 +25,9 @@ func main() {
 		var response int
 		fmt.Scan(&response)
 		switch response {
-		case 1:
-			resp, err := http.Get(fgcbaseurl + "catalog/datasets/gtfs_routes/records?where=route_id=S1") // NEceito ese más porque si no no puedo unir variables y string XDD
-			if err != nil {                                                                              // == nil green =! no green
+		case 1: // Poner esta `` es mejor que "", para poder meter uno dentro de otro, si no el query parameter falla
+			resp, err := http.Get(fgcbaseurl + `catalog/datasets/gtfs_routes/records?where=route_id="S1"`) // NEceito ese más porque si no no puedo unir variables y string XDD
+			if err != nil {                                                                                // == nil green =! no green
 				fmt.Println(err)
 			}
 			// tratamos body
