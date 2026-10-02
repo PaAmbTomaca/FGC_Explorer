@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"net/http"
 )
 
 var fgcbaseurl string
@@ -25,6 +27,19 @@ func main() {
 	fmt.Scan(&response)
 	switch response {
 	case 1:
+		resp, err := http.Get(fgcbaseurl + "catalog/datasets/gtfs_routes/records?where=route_id=S1") // NEceito ese más porque si no no puedo unir variables y string XDD
+		if err != nil {                                                                              // == nil green =! no green
+			fmt.Println(err)
+		}
+		// tratamos body
+		defer resp.Body.Close()            //--> Aun no me he enterado de que hace esto
+		body, err := io.ReadAll(resp.Body) // Aqui obtenemos el body y El error de lectura de body
+		if err != nil {                    // nil == limpio | nil != no limpio = error
+			fmt.Println("Error:") // creo que ahora entiendo porque se mira si hay error, en vez de si esta verde te deja todo el codigo más claro no? Osea estetico
+			fmt.Println(err)
+		}
+		fmt.Println(string(body)) // Haz string (Para que fmt deje printearlo??)
+
 	case 2:
 	case 3:
 		exit = true
