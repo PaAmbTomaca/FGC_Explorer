@@ -1,15 +1,46 @@
 package main
 
 import (
+	"archive/zip" // creo que su nombre lo dice todo no
 	"fmt"
 	"io"
 	"net/http"
+	"os" // porque vamos a currar con archivo
 )
 
 var fgcbaseurl string
 
 // catalogo
 // catalog/datasets/gtfs_routes/records/ --> routes define routas de transporte
+
+func list_stops(line_id string) []string {
+	// A ver que nos hemos explicao como el puto culo con que hace la funcion, más que explicar que hace cada puta linea porque estamos aprendiendo
+	// Que pasa hay datos que no se exponen via api directamente vale, si no que funcionan con ese .zip que se prepara sobretodo para google pero que nos sirve a nosotros
+	// Las paradas no se exponen, pero con el archivo de ese zip stop_times.txt con el trip_ID sacas las stop ID con las stop ID ya sacas las paradas y con el tiempo el orden
+
+	resp, err := http.Get("https://www.fgc.cat/google/google_transit.zip") // llamo aqui, en este caso este get me "baja" este archivo, realmente no me da el archivo
+	if err != nil {                                                        // Me da una secuencia de bits no es un archivo es el contenido del archivo en bits, vamos que esta en memoria
+		panic(err)
+	}
+	defer resp.Body.Close() //ACABO DE ENTEDER QUE ES DEFER, defer es ejecutate en cuanto salgas de la funcion punto(salgas como salgas),  funcion ejecuta completa pues que al final salen todos los defer
+	//Pero si petara, dejaria el archivo abierto, con defer no aunque pete la funcion con un panic, eso se lanzara
+	// El limite de conexiones de HTTPS de go es X ficheros, redis, db IMPORTANTISIMO tendiramos 1000 conexiones zombie ahi, y si algo se es que para postgres es util
+
+	archivo, err := os.Create("google_transit.zip") // recordemos que archivo maneja la coexion con el archivo abierta, osea es la puerta para escirbirlo
+	if err != nil {                                 // AHHHH claro entonces aqui verifico que no ha habido problemas al hacer dicha accion osea crearla y abrir la conexion
+		panic(err) // panic() mata la funcuon y hace un print util para esto, ahora mismo prefiero usar print para ver errores durante el debug
+	}
+	defer archivo.Close()
+
+	io.Copy(archivo, resp.Body) // IO es libreria de input output tengo que explorarla porque es pilar fundamental
+	// copiaomos el contenido en bytes del zip de la web al archivo local que hemos abierto
+	reader, err := zip.OpenReader("google_transit.zip") // libreria de ZIP abrir, eso dejara en reader un listado del contenido del zip
+	if err != nil {
+		panic(err)
+	}
+	defer reader.Close()
+
+}
 
 func main() {
 	var exit bool
@@ -26,18 +57,6 @@ func main() {
 		fmt.Scan(&response)
 		switch response {
 		case 1: // Poner esta `` es mejor que "", para poder meter uno dentro de otro, si no el query parameter falla
-			resp, err := http.Get(fgcbaseurl + `catalog/datasets/gtfs_routes/records?where=route_id="S1"`) // NEceito ese más porque si no no puedo unir variables y string XDD
-			if err != nil {                                                                                // == nil green =! no green
-				fmt.Println(err)
-			}
-			// tratamos body
-			defer resp.Body.Close()            //--> Aun no me he enterado de que hace esto
-			body, err := io.ReadAll(resp.Body) // Aqui obtenemos el body y El error de lectura de body
-			if err != nil {                    // nil == limpio | nil != no limpio = error
-				fmt.Println("Error:") // creo que ahora entiendo porque se mira si hay error, en vez de si esta verde te deja todo el codigo más claro no? Osea estetico
-				fmt.Println(err)
-			}
-			fmt.Println(string(body)) // Haz string (Para que fmt deje printearlo??)
 
 		case 2:
 		case 3:
