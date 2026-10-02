@@ -42,3 +42,4 @@ func main() {
 //Es decir una llamada a
 // https://dadesobertes.fgc.cat/api/explore/v2.1/catalog/datasets/viajes-de-hoy/records?where=route_short_name="S1"&limit=10
 //Deberia devolver las rutas de terrassa
+//Prueba
