@@ -79,11 +79,22 @@ type linea struct {
 	paradas []string
 }
 
-func cacheXD(key string) {
-	// esto es de gilipollas eh
-}
+var lineas map[string]linea
 
-func print_linea(linea string) {
+func print_linea(id string) {
+	_, existe := lineas[id]
+	if existe == true { // esta en el map
+		linea, _ := lineas[id]
+		fmt.Println("LINEA FGC", linea.id) // prin numero parada
+		// que pasa las putas paradas estas en un [], que deberia estar ordenado
+		for _, ronda := range linea.paradas { // recordamos que devoleria: indice, contenido| el incide me la pela el loop ya abanza de 1 en en 1 desde incio
+			fmt.Println(ronda)
+		}
+
+	} else {
+		// aqui toca lo divertifo que es reocontruidlo puta
+		//osea coger los archivos, y contruir la puta linea que se pida
+	}
 
 }
 
@@ -102,7 +113,7 @@ func main() {
 		fmt.Scan(&response)
 		switch response {
 		case 1: // Poner esta `` es mejor que "", para poder meter uno dentro de otro, si no el query parameter falla
-
+			print_linea("S1")
 		case 2:
 		case 3:
 			exit = true
