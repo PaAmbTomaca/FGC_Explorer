@@ -87,20 +87,22 @@ type linea struct {
 
 var lineas map[string]linea
 
-func load_trips() {
+// cambiamos para que el trip_id sea el mismo porque si no para la busqueda se nos complica jejeje, pero no no me convence porque realmente más que para recontruir al principio no tiene demasiado sentido
+// Puedo modificar la funcion de stoops para apañarlo
+
+func load_trips() (string, error) { // ahira mismo esto carga todas las lineas, hay que hacerlo para que solo cargue una, pero no tiene sentido, porque yta recorremos todo el docu, asi que XDDDD
 	data, err := os.ReadFile(trips_file)
 	if os.IsNotExist(err) { //Si no me equivoco(Lo he buscado en otro codigo XDDD) esto va a devolever un bool | Es un error de que no existe SI o NO
 		fmt.Println("El archivo no existe")
 	} else if err != nil {
-		panic(err)
+		fmt.Println(err)
 	} else { // despues de las comprobaciones aqui empiezo a cargar
 		var round int
 		contenido := string(data)
 		round = 1                              // la 0 son las cabeceras
 		rows := strings.Split(contenido, "\n") //en resumen un salto de linea se ve como \n al convertirlo, asi sabemos separar queda linea que es lo que procesaremos
 		for round < len(rows) {                // mientras round sea más pequeño que el la longitud de row
-			mitad := strings.Split(rows[round], "|") // me lo partes basandote en que dentro se separa en comas | Ya me salto la linea 0
-			row := strings.Split(mitad[0], ",")      // he partido la row en dos el array es 0 y 1 y ya| solo necesito la primera mitad
+			row := strings.Split(rows[round], ",") // error coño el trip_id es con el |
 			// Entoncer ahora necesito cargar que ocurre necesito antes un if porque solo cargo 1 liena de igual el sentido
 			// la cosa es row(que es la mitad 0 ) id service_id service_id
 			_, existe := lineas[row[0]] // el id seria el primer valor
@@ -110,31 +112,39 @@ func load_trips() {
 			} else { // no tenemos ese ID
 				register_line := linea{
 					id:      row[0],
-					trip_id: row[1],
+					trip_id: row[2],
 				}
 				lineas[row[0]] = register_line
 				round = round + 1
+				return row[2], nil
 			}
 
 		}
 	}
-}
+	return "", err // L6,6c4bdae602747613ef,6c4bdae602747613ef --> L6,6c4bdae602747613ef
+} // el trip_id es esto 6c4bdae602747613ef|6f2dc7e303
 
-func load_stop() {
+func load_stop(trip_id string) {
 	data, err := os.ReadFile(stop_times_file)
 	if os.IsNotExist(err) { //Si no me equivoco(Lo he buscado en otro codigo XDDD) esto va a devolever un bool | Es un error de que no existe SI o NO
 		fmt.Println("El archivo no existe")
 	} else if err != nil {
-		panic(err)
+		fmt.Println(err)
 	} else { // despues de las comprobaciones aqui empiezo a cargar
-		// 6c4bdae602747613ef|6f2dc7e303,05:52:00,05:52:00,PC2,1,1 neceitamos 2 y 4
+		// 6c4bdae602747613ef|6f2dc7e303,05:52:00,05:52:00,PC2,1,1 | NECESITAMOS la primera y leugo de la seunda "mitad" las posiciones 3 y 4
 		var round int
 		contenido := string(data)
 		round = 1                              // la 0 son las cabeceras
 		rows := strings.Split(contenido, "\n") //en resumen un salto de linea se ve como \n al convertirlo, asi sabemos separar queda linea que es lo que procesaremos
 		for round < len(rows) {                // mientras round sea más pequeño que el la longitud de row
-			mitad := strings.Split(rows[round], "|") // me lo partes basandote en que dentro se separa en comas | Ya me salto la linea 0
-
+			row := strings.Split(rows[round], ",") // segunda mitad a "trozos"
+			if mitad[0] == trip_id {
+				//Entonces tengo que conseguir todos los de ese trip id
+				// lo tengo que cojer de tal manera que me quede solo me queden una de casa
+			} else {
+				continue
+			}
+			round = round + 1
 		}
 	}
 }
