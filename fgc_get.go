@@ -13,7 +13,7 @@ var fgcbaseurl string
 // catalogo
 // catalog/datasets/gtfs_routes/records/ --> routes define routas de transporte
 
-func list_stops(line_id string) []string {
+func download_data() {
 	// A ver que nos hemos explicao como el puto culo con que hace la funcion, más que explicar que hace cada puta linea porque estamos aprendiendo
 	// Que pasa hay datos que no se exponen via api directamente vale, si no que funcionan con ese .zip que se prepara sobretodo para google pero que nos sirve a nosotros
 	// Las paradas no se exponen, pero con el archivo de ese zip stop_times.txt con el trip_ID sacas las stop ID con las stop ID ya sacas las paradas y con el tiempo el orden
@@ -33,12 +33,57 @@ func list_stops(line_id string) []string {
 	defer archivo.Close()
 
 	io.Copy(archivo, resp.Body) // IO es libreria de input output tengo que explorarla porque es pilar fundamental
+	// IO destino origen (No 100% pero se entiende)
 	// copiaomos el contenido en bytes del zip de la web al archivo local que hemos abierto
 	reader, err := zip.OpenReader("google_transit.zip") // libreria de ZIP abrir, eso dejara en reader un listado del contenido del zip
 	if err != nil {
 		panic(err)
 	}
 	defer reader.Close()
+
+	// Esto lo estaba "copiando" de chati pero no entendia que condicion del go, luego me he puesto a leer
+	// Podrias hacer la tipica de var rounds int y for rounds < len(reader.File) y haria lo mismo
+	// Que pasa los señores que crearon go, ya vieron que eso era un palo recurrente, enteondes el for se ejecuta el numero de "vueltas" del range
+	for _, file := range reader.File {
+		// necesito dos archivos para operar trips_id.txt y stop_times.txt
+		if file.Name == "stop_times.txt" || file.Name == "trips.txt" {
+			// en esta vuelta es esos archivos, si hemos entrado aqui es que si, asi que tenemos que sacarlos
+			fmt.Println("Extrayendo:", file.Name)
+
+			contenido, err := file.Open() // lo devuelto del zip concreto de esta ronda , error
+			if err != nil {
+				panic(err)
+			}
+
+			archivo, err := os.Create(file.Name) // creo archivo con el nombre igual al que hay en el ZIP stop_times.txt trips_id.txt
+			// identificador_conexio?, error
+			if err != nil {
+				contenido.Close()
+				panic(err)
+			}
+			_, err = io.Copy(archivo, contenido) // destino origen? La verdad que normalmente siempre es al rever
+
+			contenido.Close()
+			archivo.Close()
+
+			if err != nil {
+				panic(err)
+			}
+		}
+	}
+
+}
+
+type linea struct {
+	id      string
+	paradas []string
+}
+
+func cacheXD(key string) {
+	// esto es de gilipollas eh
+}
+
+func print_linea(linea string) {
 
 }
 
