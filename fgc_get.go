@@ -6,9 +6,16 @@ import (
 	"io"
 	"net/http"
 	"os" // porque vamos a currar con archivo
+	"strings"
 )
 
-var fgcbaseurl string
+
+const (
+	fgcbaseurl			= "https://dadesobertes.fgc.cat/api/explore/v2.1/"
+	trips_file			= "trips.txt"
+	stop_times_file		= "stop_times.txt"
+)
+
 
 // catalogo
 // catalog/datasets/gtfs_routes/records/ --> routes define routas de transporte
@@ -81,6 +88,37 @@ type linea struct {
 
 var lineas map[string]linea
 
+func load_trips() {
+	data, err := os.ReadFile(trips_file)
+	if os.IsNotExist(err) { //Si no me equivoco(Lo he buscado en otro codigo XDDD) esto va a devolever un bool | Es un error de que no existe SI o NO
+		fmt.Println("El archivo no existe")
+	} else if err != nil {
+		panic(err)
+	} else { // despues de las comprobaciones aqui empiezo a cargar
+		var round int
+		contenido := string(data)
+		round = 1 // la 0 son las cabeceras
+		rows := strings.Split(contenido, "\n") //en resumen un salto de linea se ve como \n al convertirlo, asi sabemos separar queda linea que es lo que procesaremos
+		for round < len(rows) { // mientras round sea más pequeño que el la longitud de row
+			celda := strings.Split(rows[round], ",") // me lo partes basandote en que dentro se separa en comas
+			// Entoncer ahora necesito cargar que ocurre necesito antes un if porque solo cargo 1 liena de igual el sentido
+			// Son 5 celdas por row, es decir la posicion 0 de cada linea, es el route_id S1, S2...
+			_, os.ErrExist := lineas[] // el id seria el primer valor, 
+		}
+	}
+}
+
+func load_stop() {
+	data, err := os.ReadFile(stop_times_file)
+	if os.IsNotExist(err) { //Si no me equivoco(Lo he buscado en otro codigo XDDD) esto va a devolever un bool | Es un error de que no existe SI o NO
+		fmt.Println("El archivo no existe")
+	} else if err != nil {
+		panic(err)
+	} else { // despues de las comprobaciones aqui empiezo a cargar
+
+	}
+}
+
 func print_linea(id string) {
 	_, existe := lineas[id]
 	if existe == true { // esta en el map
@@ -94,13 +132,13 @@ func print_linea(id string) {
 	} else {
 		// aqui toca lo divertifo que es reocontruidlo puta
 		//osea coger los archivos, y contruir la puta linea que se pida
+		//empizo con trips.txt
 	}
 
 }
 
 func main() {
 	var exit bool
-	fgcbaseurl = "https://dadesobertes.fgc.cat/api/explore/v2.1/"
 	for exit == false {
 		fmt.Println(" ____________________________________ ")
 		fmt.Println("|===============MENU=================|")
