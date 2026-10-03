@@ -9,13 +9,11 @@ import (
 	"strings"
 )
 
-
 const (
-	fgcbaseurl			= "https://dadesobertes.fgc.cat/api/explore/v2.1/"
-	trips_file			= "trips.txt"
-	stop_times_file		= "stop_times.txt"
+	fgcbaseurl      = "https://dadesobertes.fgc.cat/api/explore/v2.1/"
+	trips_file      = "trips.txt"
+	stop_times_file = "stop_times.txt"
 )
-
 
 // catalogo
 // catalog/datasets/gtfs_routes/records/ --> routes define routas de transporte
@@ -84,6 +82,7 @@ func download_data() {
 type linea struct {
 	id      string
 	paradas []string
+	trip_id string
 }
 
 var lineas map[string]linea
@@ -97,13 +96,26 @@ func load_trips() {
 	} else { // despues de las comprobaciones aqui empiezo a cargar
 		var round int
 		contenido := string(data)
-		round = 1 // la 0 son las cabeceras
+		round = 1                              // la 0 son las cabeceras
 		rows := strings.Split(contenido, "\n") //en resumen un salto de linea se ve como \n al convertirlo, asi sabemos separar queda linea que es lo que procesaremos
-		for round < len(rows) { // mientras round sea más pequeño que el la longitud de row
-			celda := strings.Split(rows[round], ",") // me lo partes basandote en que dentro se separa en comas
+		for round < len(rows) {                // mientras round sea más pequeño que el la longitud de row
+			mitad := strings.Split(rows[round], "|") // me lo partes basandote en que dentro se separa en comas | Ya me salto la linea 0
+			row := strings.Split(mitad[0], ",")      // he partido la row en dos el array es 0 y 1 y ya| solo necesito la primera mitad
 			// Entoncer ahora necesito cargar que ocurre necesito antes un if porque solo cargo 1 liena de igual el sentido
-			// Son 5 celdas por row, es decir la posicion 0 de cada linea, es el route_id S1, S2...
-			_, os.ErrExist := lineas[] // el id seria el primer valor, 
+			// la cosa es row(que es la mitad 0 ) id service_id service_id
+			_, existe := lineas[row[0]] // el id seria el primer valor
+			if existe == true {         // ya hay en el map algo con ese id
+				round = round + 1
+				continue
+			} else { // no tenemos ese ID
+				register_line := linea{
+					id:      row[0],
+					trip_id: row[1],
+				}
+				lineas[row[0]] = register_line
+				round = round + 1
+			}
+
 		}
 	}
 }
@@ -115,7 +127,15 @@ func load_stop() {
 	} else if err != nil {
 		panic(err)
 	} else { // despues de las comprobaciones aqui empiezo a cargar
+		// 6c4bdae602747613ef|6f2dc7e303,05:52:00,05:52:00,PC2,1,1 neceitamos 2 y 4
+		var round int
+		contenido := string(data)
+		round = 1                              // la 0 son las cabeceras
+		rows := strings.Split(contenido, "\n") //en resumen un salto de linea se ve como \n al convertirlo, asi sabemos separar queda linea que es lo que procesaremos
+		for round < len(rows) {                // mientras round sea más pequeño que el la longitud de row
+			mitad := strings.Split(rows[round], "|") // me lo partes basandote en que dentro se separa en comas | Ya me salto la linea 0
 
+		}
 	}
 }
 
