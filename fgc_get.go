@@ -97,7 +97,6 @@ func load_trips() (string, error) { // ahira mismo esto carga todas las lineas, 
 	} else if err != nil {
 		fmt.Println(err)
 	} else { // despues de las comprobaciones aqui empiezo a cargar
-		fmt.Println("He llegado aqui")
 		var round int
 		contenido := string(data)
 		round = 1                              // la 0 son las cabeceras
@@ -115,7 +114,7 @@ func load_trips() (string, error) { // ahira mismo esto carga todas las lineas, 
 					id:      row[0],
 					trip_id: row[2],
 				}
-				fmt.Println(row[0], row[2]) // L6 6c4bdae302747640fd55c10d40|6f2dc7e303 lo printea bien
+				// L6 6c4bdae302747640fd55c10d40|6f2dc7e303 lo printea bien
 				// capaz es porque le falta un dato? no deberia perdo bueno
 
 				lineas[row[0]] = register_line // aqui da error? coño porque asi no se suman
@@ -123,13 +122,12 @@ func load_trips() (string, error) { // ahira mismo esto carga todas las lineas, 
 				round = round + 1
 				return row[2], nil
 			}
-
 		}
 	}
 	return "", err // L6,6c4bdae602747613ef,6c4bdae602747613ef --> L6,6c4bdae602747613ef
 } // el trip_id es esto 6c4bdae602747613ef|6f2dc7e303
 
-func load_stop(trip_id string) {
+func load_stop(line_id string) {
 	data, err := os.ReadFile(stop_times_file)
 	if os.IsNotExist(err) { //Si no me equivoco(Lo he buscado en otro codigo XDDD) esto va a devolever un bool | Es un error de que no existe SI o NO
 		fmt.Println("El archivo no existe")
@@ -143,6 +141,13 @@ func load_stop(trip_id string) {
 		rows := strings.Split(contenido, "\n") //en resumen un salto de linea se ve como \n al convertirlo, asi sabemos separar queda linea que es lo que procesaremos
 		for round < len(rows) {                // mientras round sea más pequeño que el la longitud de row
 			row := strings.Split(rows[round], ",") // segunda mitad a "trozos"
+			// Lo de arriba coje el stop_times y lo separa por ,
+			// 6c4bdae302747640fd55c10d40|6f2dc7e303,05:37:00,05:37:00,PC1,1,1
+			// El problema es que yo le paso el nombre de la linea S1
+			// son 114557 lineas, osea que tarda un rato largo
+			// se puede partir en 4 el doc y procesarlo en paralelo?
+			// primero necesito cojer el ID en curod "S1" y pasarlo al trip_id
+
 			if row[0] == trip_id {
 				//Entonces tengo que conseguir todos los de ese trip id
 				// ENtonces ahora necesito time + codigo de estacion // filtramos arribal y stop id
@@ -172,7 +177,7 @@ func print_linea(id string) {
 		}
 
 	} else {
-
+		load_stop("S1")
 	}
 
 }
@@ -187,16 +192,17 @@ func main() {
 		fmt.Println("|===============MENU=================|")
 		fmt.Println("|____________________________________|")
 		fmt.Println("|        1 - Ver Linea S1 Terrassa   |")
-		fmt.Println("|        2 - Post                    |")
-		fmt.Println("|        3 - Salir                   |")
-		fmt.Println("|____________________________________|")
+		fmt.Println("|        2 - Listar Lineas           |")
+		fmt.Println("|        3 - Ver Trayecto Linea      |")
+		fmt.Println("|        4 - Salir                   |")
+		fmt.Println("|_________________________________̣̣___|")
 		var response int
 		fmt.Scan(&response)
 		switch response {
 		case 1: // Poner esta `` es mejor que "", para poder meter uno dentro de otro, si no el query parameter falla
 			print_linea("S1")
 		case 2:
-		case 3:
+		case 4:
 			exit = true
 		}
 	}
