@@ -131,16 +131,17 @@ func load_stop(trip_id string) {
 	} else if err != nil {
 		fmt.Println(err)
 	} else { // despues de las comprobaciones aqui empiezo a cargar
-		// 6c4bdae602747613ef|6f2dc7e303,05:52:00,05:52:00,PC2,1,1 | NECESITAMOS la primera y leugo de la seunda "mitad" las posiciones 3 y 4
+		// trip_id,arrival_time,departure_time,stop_id,stop_sequence,timepoint // 0 1 3
 		var round int
 		contenido := string(data)
 		round = 1                              // la 0 son las cabeceras
 		rows := strings.Split(contenido, "\n") //en resumen un salto de linea se ve como \n al convertirlo, asi sabemos separar queda linea que es lo que procesaremos
 		for round < len(rows) {                // mientras round sea más pequeño que el la longitud de row
 			row := strings.Split(rows[round], ",") // segunda mitad a "trozos"
-			if mitad[0] == trip_id {
+			if row[0] == trip_id {
 				//Entonces tengo que conseguir todos los de ese trip id
-				// lo tengo que cojer de tal manera que me quede solo me queden una de casa
+				// ENtonces ahora necesito time + codigo de estacion // filtramos arribal y stop id
+
 			} else {
 				continue
 			}
