@@ -141,7 +141,13 @@ func load_stop(trip_id string) {
 			if row[0] == trip_id {
 				//Entonces tengo que conseguir todos los de ese trip id
 				// ENtonces ahora necesito time + codigo de estacion // filtramos arribal y stop id
-
+				// Aqui cargamos las paradas de la linea, el stop_sequence nos dice el orden
+				// row[3] es stop_id, row[1] es arrival_time
+				lineaData, existe := lineas[trip_id]
+				if existe {
+					lineaData.paradas = append(lineaData.paradas, row[1]+" - "+row[3]) // arrival_time - stop_id
+					lineas[trip_id] = lineaData
+				}
 			} else {
 				continue
 			}
@@ -164,6 +170,7 @@ func print_linea(id string) {
 		// aqui toca lo divertifo que es reocontruidlo puta
 		//osea coger los archivos, y contruir la puta linea que se pida
 		//empizo con trips.txt
+		fmt.Println("llego aqui?", existe)
 	}
 
 }
