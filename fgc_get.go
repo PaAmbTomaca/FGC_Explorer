@@ -97,6 +97,7 @@ func load_trips() (string, error) { // ahira mismo esto carga todas las lineas, 
 	} else if err != nil {
 		fmt.Println(err)
 	} else { // despues de las comprobaciones aqui empiezo a cargar
+		fmt.Println("He llegado aqui")
 		var round int
 		contenido := string(data)
 		round = 1                              // la 0 son las cabeceras
@@ -110,11 +111,15 @@ func load_trips() (string, error) { // ahira mismo esto carga todas las lineas, 
 				round = round + 1
 				continue
 			} else { // no tenemos ese ID
-				register_line := linea{
+				register_line := linea{ // osea crea este var que el contenido sea linea
 					id:      row[0],
 					trip_id: row[2],
 				}
-				lineas[row[0]] = register_line
+				fmt.Println(row[0], row[2]) // L6 6c4bdae302747640fd55c10d40|6f2dc7e303 lo printea bien
+				// capaz es porque le falta un dato? no deberia perdo bueno
+
+				lineas[row[0]] = register_line // aqui da error? coño porque asi no se suman
+				// recordar que lineas es el map, del  struc linea
 				round = round + 1
 				return row[2], nil
 			}
@@ -146,7 +151,7 @@ func load_stop(trip_id string) {
 				lineaData, existe := lineas[trip_id]
 				if existe {
 					lineaData.paradas = append(lineaData.paradas, row[1]+" - "+row[3]) // arrival_time - stop_id
-					lineas[trip_id] = lineaData
+					lineas[trip_id] = lineaData                                        // ESTA PARTE MISTRAL LARGE 4
 				}
 			} else {
 				continue
@@ -167,16 +172,16 @@ func print_linea(id string) {
 		}
 
 	} else {
-		// aqui toca lo divertifo que es reocontruidlo puta
-		//osea coger los archivos, y contruir la puta linea que se pida
-		//empizo con trips.txt
-		fmt.Println("llego aqui?", existe)
+
 	}
 
 }
 
 func main() {
 	var exit bool
+	lineas = make(map[string]linea)
+	download_data()
+	load_trips()
 	for exit == false {
 		fmt.Println(" ____________________________________ ")
 		fmt.Println("|===============MENU=================|")
